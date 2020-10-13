@@ -2,7 +2,7 @@ variable "s3_bucket_name" {
   default = "nginx-dynamo-bucket-888"
 }
 variable "dynamo_db_table_name" {
-  default = "nginx-locks"
+  default = "nginx-locks-2"
 }
 variable "iam_user_name" {
   default = "nginx-user"
