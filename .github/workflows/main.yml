@@ -20,7 +20,7 @@ jobs:
         tf_version=$TERRAFORM_VERSION
         wget https://releases.hashicorp.com/terraform/"$tf_version"/terraform_"$tf_version"_linux_amd64.zip
         unzip -u terraform_"$tf_version"_linux_amd64.zip
-        rm /usr/local/bin/terraform
+        sudo rm /usr/local/bin/terraform
         sudo mv terraform /usr/local/bin/
     - name: Verify Terraform version
       run: terraform --version
