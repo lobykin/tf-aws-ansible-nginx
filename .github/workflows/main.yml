@@ -10,6 +10,8 @@ jobs:
 
     - name: Workflow run cleanup action
       uses: rokroskar/workflow-run-cleanup-action@v0.2.2
+      env: 
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Install Terraform
       env:
