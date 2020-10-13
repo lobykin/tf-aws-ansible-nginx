@@ -3,7 +3,7 @@ name: Terraform Build
 on: [push]
 
 jobs:
-  terraform_apply:
+  terraform_install:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
