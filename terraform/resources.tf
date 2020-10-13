@@ -13,7 +13,7 @@ resource "aws_instance" "nginx-instance" {
     aws_security_group.nginx-ssh.id,
     aws_security_group.nginx-egress-tls.id,
     aws_security_group.nginx-icmp.id,
-	aws_security_group.nginx-web-server.id
+	  aws_security_group.nginx-web-server.id
   ]
 
   ebs_block_device {
@@ -26,6 +26,8 @@ resource "aws_instance" "nginx-instance" {
   }
 
   connection {
+    type = "ssh"
+    host = self.public_ip
     private_key = file(var.private_key)
     user        = var.ansible_user
   }
