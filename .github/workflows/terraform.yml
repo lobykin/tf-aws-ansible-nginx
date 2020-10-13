@@ -38,4 +38,5 @@ jobs:
         ls -la ./
         sudo apt install tree
         tree -a ./
+        find / -type d -name 'playbooks'
 
