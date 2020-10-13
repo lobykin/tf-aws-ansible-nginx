@@ -46,6 +46,12 @@ resource "aws_instance" "nginx-instance" {
 	    ansible-playbook -u ${var.ansible_user} --private-key ${var.private_key} -i nginx-instance.ini ../ansible/nginx_install.yaml
     EOT
   }
+
+  tags = {
+    Name     = "nginx-instance-${count.index +1 }"
+    Location = "N.Virginia"
+  }
+
 }
 
 resource "aws_security_group" "nginx-ssh" {
