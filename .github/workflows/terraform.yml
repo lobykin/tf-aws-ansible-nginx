@@ -16,6 +16,7 @@ jobs:
         EC2_KEY_PEM_64: ${{ secrets.EC2_KEY_PEM_64 }}
         EC2_KEY_PUB_64: ${{ secrets.EC2_KEY_PUB_64 }}
       run: |
+        mkdir -p ~/.ssh
         echo $EC2_KEY_PEM_64 | openssl base64 -A -d > ~/.ssh/ec2_key_pair.pem 
         chmod 400 ~/.ssh/ec2_key_pair.pem
         echo $EC2_KEY_PUB_64 | openssl base64 -A -d > ~/.ssh/ec2_key_pair.pub
