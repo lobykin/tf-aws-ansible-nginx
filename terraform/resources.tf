@@ -55,7 +55,7 @@ resource "aws_security_group" "nginx-ssh" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
-  tags {
+  tags = {
     Name = "nginx-ssh-vpc"
   }
 }
@@ -75,7 +75,7 @@ resource "aws_security_group" "nginx-web" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
-  tags {
+  tags = {
     Name = "nginx-web-vpc"
   }
 }
@@ -89,7 +89,7 @@ resource "aws_security_group" "nginx-egress-tls" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
-  tags {
+  tags = {
     Name = "nginx-egress-tls-vpc"
   }
 }
@@ -105,7 +105,7 @@ resource "aws_security_group" "nginx-icmp" {
     ipv6_cidr_blocks = ["::/0"]
   }
 
-  tags {
+  tags = {
     Name = "nginx-icmp-vpc"
   }
 }
@@ -120,7 +120,7 @@ resource "aws_security_group" "nginx-web-server" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags {
+  tags = {
     Name = "nginx-web-server-vpc"
   }
 }
