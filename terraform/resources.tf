@@ -41,7 +41,7 @@ resource "aws_instance" "nginx-instance" {
       sleep 600;
 	    >nginx-instance.ini;
 	    echo "[nginx-instance]" | tee -a nginx-instance.ini;
-	    echo "${aws_instance.nginx-instance.public_ip.id[count.index]} ansible_user=${var.ansible_user} ansible_ssh_private_key_file=${var.private_key}" | tee -a nginx-instance.ini;
+	    echo "${aws_instance.nginx-instance[count.index].public_ip} ansible_user=${var.ansible_user} ansible_ssh_private_key_file=${var.private_key}" | tee -a nginx-instance.ini;
       export ANSIBLE_HOST_KEY_CHECKING=False;
 	    ansible-playbook -u ${var.ansible_user} --private-key ${var.private_key} -i nginx-instance.ini ../ansible/nginx_install.yaml
     EOT
