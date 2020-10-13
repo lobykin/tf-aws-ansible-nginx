@@ -12,14 +12,14 @@ jobs:
       env: 
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    - uses: actions/checkout@v1
-    - name: Install Terraform
+    - uses: actions/checkout@v2
+    - name: Installing Terraform
       env:
         TERRAFORM_VERSION: "0.13.4"
       run: |
         tf_version=$TERRAFORM_VERSION
         wget -q https://releases.hashicorp.com/terraform/"$tf_version"/terraform_"$tf_version"_linux_amd64.zip
-        unzip -o -d terraform_"$tf_version"_linux_amd64.zip
+        unzip -ov terraform_"$tf_version"_linux_amd64.zip
         sudo mv -f terraform /usr/local/bin/
     - name: Verify Terraform version
       run: terraform --version
