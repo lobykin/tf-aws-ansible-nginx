@@ -8,6 +8,9 @@ jobs:
     steps:
     - uses: actions/checkout@v1
 
+    - name: Workflow run cleanup action
+      uses: rokroskar/workflow-run-cleanup-action@v0.2.2
+
     - name: Install Terraform
       env:
         TERRAFORM_VERSION: "0.13.4"
