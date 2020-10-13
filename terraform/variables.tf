@@ -8,10 +8,6 @@ variable "iam_user_name" {
   default = "nginx-user"
 }
 
-variable "state_key" {
-  default = "terraform.tfstate"
-}
-
 variable "profile" {
   default = "nginx-user"
 }
