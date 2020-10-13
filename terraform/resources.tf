@@ -94,7 +94,7 @@ resource "aws_instance" "nginx-instance" {
 	    echo "[nginx-instance]" | tee -a nginx-instance.ini;
 	    echo "${aws_instance.nginx-instance[count.index].public_ip} ansible_user=${var.ansible_user} ansible_ssh_private_key_file=${var.private_key}" | tee -a nginx-instance.ini;
       export ANSIBLE_HOST_KEY_CHECKING=False;
-	    ansible-playbook -u ${var.ansible_user} --private-key ${var.private_key} -i nginx-instance.ini ../ansible/nginx_install.yaml
+	    ansible-playbook -u ${var.ansible_user} --private-key ${var.private_key} -i nginx-instance.ini ./ansible/nginx_install.yaml
     EOT
   }
 
@@ -154,7 +154,7 @@ resource "aws_security_group" "nginx-egress-tls" {
 }
 
 resource "aws_security_group" "nginx-icmp" {
-  name        = "default-ping-example"
+  name        = "nginx-icmp"
   description = "Security group to ping instance"
   ingress {
     from_port        = -1

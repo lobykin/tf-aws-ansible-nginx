@@ -12,11 +12,12 @@ jobs:
       run: terraform --version
 
     - name: Generate Key Pair
+      env:
+        EC2_KEY_PEM_64: ${{ secrets.EC2_KEY_PEM_64 }}
+        EC2_KEY_PUB_64: ${{ secrets.EC2_KEY_PUB_64 }}
       run: |
-        ssh-keygen -t rsa -b 2048 -f ~/.ssh/ec2_key_pair.pem -q -P ''
-        chmod 400 ~/.ssh/ec2_key_pair.pem
-        ssh-keygen -y -f ~/.ssh/ec2_key_pair.pem > ~/.ssh/ec2_key_pair.pub
-        
+        echo $EC2_KEY_PEM_64 | openssl base64 -A -d > ~/.ssh/new_key.pem && chmod 400 ~/.ssh/ec2_key_pair.pem
+        echo $EC2_KEY_PUB_64 | openssl base64 -A -d > ~/.ssh/new_key.pem && chmod 644 ~/.ssh/ec2_key_pair.pub
     - name: Terraform init
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
