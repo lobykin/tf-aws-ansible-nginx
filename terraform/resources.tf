@@ -1,8 +1,59 @@
+// Creating Bucket to store the Terraform Configuration
+resource "aws_s3_bucket" "state_bucket" {
+  bucket = var.s3_bucket_name
+
+// Best practice to add encryption the S3 bucket at rest by default
+  server_side_encryption_configuration {
+    rule {
+      apply_server_side_encryption_by_default {
+        sse_algorithm = "AES256"
+      }
+    }
+  }
+
+// Prevents Terraform from destroying or replacing this object
+  lifecycle {
+    prevent_destroy = true
+  }
+
+// Keeping versions history
+  versioning {
+    enabled = true
+  }
+
+  tags = {
+    Terraform = "true"
+  }
+}
+
+// Build a DynamoDB to use for terraform state locking
+resource "aws_dynamodb_table" "tf_lock_state" {
+  name = var.dynamo_db_table_name
+
+// Pay per request is cheaper for low-i/o applications, like our TF lock state
+  billing_mode = "PAY_PER_REQUEST"
+
+// Hash key is required, and must be an attribute
+  hash_key = "LockID"
+
+// Attribute LockID is required for TF to use this table for lock state
+  attribute {
+    name = "LockID"
+    type = "S"
+  }
+
+  tags = {
+    Name    = var.dynamo_db_table_name
+    BuiltBy = "Terraform"
+  }
+}
+
+// Building key pair for AWS Instance
 resource "aws_key_pair" "key_pair_pem" {
   key_name   = "ec2_key_pair"
   public_key = file(var.public_key)
 }
-
+// Building  Instance
 resource "aws_instance" "nginx-instance" {
   count = var.instance_count
   ami           = var.ami
