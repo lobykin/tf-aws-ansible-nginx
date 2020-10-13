@@ -1,19 +1,19 @@
 resource "aws_key_pair" "key_pair_pem" {
   key_name   = "github"
-  public_key = "${file(var.public_key)}"
+  public_key = file(var.public_key)
 }
 
 resource "aws_instance" "nginx-instance" {
-  count = "${var.instance_count}"
-  ami           = "${var.ami}"
-  instance_type = "${var.instance}"
-  key_name      = "${aws_key_pair.key_pair_pem.key_name}"
+  count = var.instance_count
+  ami           = var.ami
+  instance_type = var.instance
+  key_name      = aws_key_pair.key_pair_pem.key_name
   vpc_security_group_ids = [
-    "${aws_security_group.nginx-web.id}",
-    "${aws_security_group.nginx-ssh.id}",
-    "${aws_security_group.nginx-egress-tls.id}",
-    "${aws_security_group.nginx-icmp.id}",
-	"${aws_security_group.nginx-web-server.id}"
+    aws_security_group.nginx-web.id,
+    aws_security_group.nginx-ssh.id,
+    aws_security_group.nginx-egress-tls.id,
+    aws_security_group.nginx-icmp.id,
+	aws_security_group.nginx-web-server.id
   ]
 
   ebs_block_device {
@@ -26,20 +26,20 @@ resource "aws_instance" "nginx-instance" {
   }
 
   connection {
-    private_key = "${file(var.private_key)}"
-    user        = "${var.ansible_user}"
+    private_key = file(var.private_key)
+    user        = var.ansible_user
   }
 
-  provisioner "python_install" {
+  provisioner "remote-exec" {
     inline = ["sudo apt-get -qq install python -y"]
   }
 
-  provisioner "nginx_playbook" {
+  provisioner "local-exec" {
     command = <<EOT
       sleep 600;
 	  >nginx-instance.ini;
 	  echo "[nginx-instance]" | tee -a nginx-instance.ini;
-	  echo "${aws_instance.nginx-instance.public_ip} ansible_user=${var.ansible_user} ansible_ssh_private_key_file=${var.private_key}" | tee -a nginx-instance.ini;
+	  echo aws_instance.nginx-instance.public_ip} ansible_user=${var.ansible_user} ansible_ssh_private_key_file=${var.private_key}" | tee -a nginx-instance.ini;
       export ANSIBLE_HOST_KEY_CHECKING=False;
 	  ansible-playbook -u ${var.ansible_user} --private-key ${var.private_key} -i nginx-instance.ini ../ansible/nginx_install.yaml
     EOT
