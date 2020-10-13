@@ -1,11 +1,15 @@
 variable "s3_bucket_name" {
-  default = "nginx-bucket"
+  default = "nginx-dynamo-bucket-888"
 }
 variable "dynamo_db_table_name" {
   default = "nginx-locks"
 }
 variable "iam_user_name" {
   default = "nginx-user"
+}
+
+variable "state_key" {
+  default = "terraform.tfstate"
 }
 
 variable "profile" {
