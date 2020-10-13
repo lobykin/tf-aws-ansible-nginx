@@ -1,5 +1,5 @@
 resource "aws_key_pair" "key_pair_pem" {
-  key_name   = "github"
+  key_name   = "ec2_key_pair"
   public_key = file(var.public_key)
 }
 

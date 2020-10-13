@@ -15,11 +15,11 @@ variable "instance_count" {
 }
 
 variable "public_key" {
-  default = "~/.ssh/github.pub"
+  default = "~/.ssh/ec2_key_pair.pub"
 }
 
 variable "private_key" {
-  default = "~/.ssh/github.pem"
+  default = "~/.ssh/ec2_key_pair.pem"
 }
 
 variable "ansible_user" {

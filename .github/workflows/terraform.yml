@@ -11,6 +11,12 @@ jobs:
     - name: Verify Terraform version
       run: terraform --version
 
+    - name: Generate Key Pair
+      run: |
+        ssh-keygen -t rsa -b 2048 -f ~/.ssh/ec2_key_pair.pem -q -P ''
+        chmod 400 ~/.ssh/ec2_key_pair.pem
+        ssh-keygen -y -f ~/.ssh/ec2_key_pair.pem > ~/.ssh/ec2_key_pair.pub
+        
     - name: Terraform init
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
