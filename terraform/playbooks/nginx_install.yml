@@ -5,37 +5,25 @@
   become_method: sudo
 
   tasks:
-    - name: Run the equivalent of "apt-get update"
-      apt:
-        update_cache: yes
-    - name: Configuring Docker Repository
-      yum_repository:
-        name: Docker
-        description: "Docker Repo"
-        baseurl: "https://download.docker.com/linux/centos/docker-ce.repo" 
-        gpgcheck: no
-      register: x
- 
-    - name: Checking Configuration Status
-      debug:
-        var: x.failed
- 
-    - name: Installing Docker
-      package:
-        name: "docker-ce-18.06.3.ce-3.el7.x86_64"
+    - name: Install aptitude using apt
+      apt: name=aptitude state=latest update_cache=yes force_apt_get=yes
+
+    - name: Install required system packages
+      apt: name={{ item }} state=latest update_cache=yes
+      loop: [ 'apt-transport-https', 'ca-certificates', 'curl', 'software-properties-common', 'python3-pip', 'virtualenv', 'python3-setuptools']
+
+    - name: Add Docker GPG apt Key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
         state: present
-      register: y
- 
-    - name: Checking Install Status
-      debug:
-        var: y.failed
- 
-    - name: Starting Docker Daemon
-      service:
-        name: docker
-        state: started
-        enabled: yes
-      when: y.failed == false
+
+    - name: Add Docker Repository
+      apt_repository:
+        repo: deb https://download.docker.com/linux/ubuntu bionic stable
+        state: present
+
+    - name: Update apt and install docker-ce
+      apt: update_cache=yes name=docker-ce state=latest
 
     - name: Install pip
       apt: 
@@ -46,29 +34,54 @@
       pip: 
        name: docker
        executable: pip3
-      
-    - name: Build Docker image from Dockerfile
-      docker_image:
-        build: 
-          path: /tmp
-        name: nginx-web-servers
-        source: build
 
-    - name: Container present
-      docker_container:
-        name: nginx-web-server
+    - name: Copy Dockerfile
+      copy:
+        src: ./Dockerfile
+        dest: /tmp/Dockerfile      
+
+    - name: build container image
+      docker_image:
+        name: nginx-web-server:v1.0
+        build:
+          path: /tmp
+        source: build
+        state: present        
+
+    - name: archive container image as a tarball
+      docker_image:
+        name: nginx-web-server:v1.0
+        archive_path: /tmp/nginx-web-server_v1_0.tar
+        source: pull
         state: present
-        image: nginx-web-server:latest
-        command: sleep infinity
-        
+
+    - name: fetch archived image
+      fetch:
+        src: /tmp/nginx-web-server_v1_0.tar
+        dest: ./nginx-web-server_v1_0.tar
+        flat: true
+
+    - name: copy tarball to root
+      copy:
+        src: ./nginx-web-server_v1_0.tar
+        dest: /root/nginx-web-server_v1_0.tar
+
+    - name: load container from tarball
+      docker_image:
+        name: nginx-web-server:v1.0
+        load_path: /root/nginx-web-server_v1_0.tar
+        state: present
+        source: load
 
     - name: Running the container
       docker_container:
-        image: nginx-web-server:latest
+        name: nginx-server
+        image: nginx-web-server:v1.0
         state: started
-        healthcheck: 
+#        healthcheck: 
 #          test: ["CMD", "curl", "--fail", "http://nginx.host.com"]
 #          interval: 1m30s
 #          timeout: 10s
 #          retries: 3
-#          start_period: 30s        
+#          start_period: 30s
+        

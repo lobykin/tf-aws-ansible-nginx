@@ -1,67 +1,62 @@
 - name: Install Nginx
 - hosts: nginx-instance
   tasks: 
-   - name: Configuring Docker Repository
-     yum_repository:
-       name: Docker
-       description: "Docker Repo"
-       baseurl: "https://download.docker.com/linux/centos/docker-ce.repo" 
-       gpgcheck: no
-     register: x
+    - name: Install aptitude using apt
+      apt: name=aptitude state=latest update_cache=yes force_apt_get=yes
 
-   - name: Checking Configuration Status
-     debug:
-       var: x.failed
+    - name: Install required system packages
+      apt: name={{ item }} state=latest update_cache=yes
+      loop: [ 'apt-transport-https', 'ca-certificates', 'curl', 'software-properties-common', 'python3-pip', 'virtualenv', 'python3-setuptools']
 
-   - name: Installing Docker
-     package:
-       name: "docker-ce-18.06.3.ce-3.el7.x86_64"
-       state: present
-     register: y
+    - name: Add Docker GPG apt Key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
 
-   - name: Checking Install Status
-     debug:
-       var: y.failed
+    - name: Add Docker Repository
+      apt_repository:
+        repo: deb https://download.docker.com/linux/ubuntu bionic stable
+        state: present
 
-   - name: Starting Docker Daemon
-     service:
-       name: docker
-       state: started
-       enabled: yes
-     when: y.failed == false
+    - name: Update apt and install docker-ce
+      apt: update_cache=yes name=docker-ce state=latest
 
-   - name: Install
-     command: "pip install docker-py"    
+    - name: Install Docker Module for Python
+      pip:
+        name: docker
 
-   - name: Pull a Docker Image
-     docker_image: 
-        name: httpd
-        tag: latest
-        source: pull
-     register: z
-   - name: Checking Pull Status
-     debug: 
-       var: z
-
-   - name: Creating a Persistent Volume Dir
-     file:
-       path: "/root/pv"
-       state: directory
-
-   - name: Copying the HTML code in the Directory
-     copy: 
-       src: "/root/Desktop/index.html"
-       dest: "/root/pv"
-
-   - name: Launching an HTTPD Container
-     when: z.failed == false
-     docker_container:
-       name: apache-server
-       image: httpd
-       state: started
-       exposed_ports:
-         - "80"
-       ports:
-         - "8080:80"
-       volumes: 
-         - /root/pv:/usr/local/apache2/htdocs
+    - name: Install
+      command: "pip install docker-py"    
+   
+    - name: Pull a Docker Image
+      docker_image: 
+         name: httpd
+         tag: latest
+         source: pull
+      register: z
+    - name: Checking Pull Status
+      debug: 
+        var: z
+   
+    - name: Creating a Persistent Volume Dir
+      file:
+        path: "/root/pv"
+        state: directory
+   
+    - name: Copying the HTML code in the Directory
+      copy: 
+        src: "/root/Desktop/index.html"
+        dest: "/root/pv"
+   
+    - name: Launching an HTTPD Container
+      when: z.failed == false
+      docker_container:
+        name: apache-server
+        image: httpd
+        state: started
+        exposed_ports:
+          - "80"
+        ports:
+          - "8080:80"
+        volumes: 
+          - /root/pv:/usr/local/apache2/htdocs
