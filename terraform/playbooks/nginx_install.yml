@@ -19,13 +19,13 @@
 
     - name: Install pip
       apt: 
-       name: python-pip 
+       name: python3-pip 
        state: present
       
-    - name: install docker-py
+    - name: install docker
       pip: 
-       name: docker-py
-       executable: pip
+       name: docker
+       executable: pip3
       
     - name: Build Docker image from Dockerfile
       docker_image:
