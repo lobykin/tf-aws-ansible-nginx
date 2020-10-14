@@ -36,8 +36,8 @@
     - name: Build Docker image from Dockerfile
       community.general.docker_image:
         build: 
-          path: /tmp/Dockerfile
-        name: nginx-web-server
+          path: /tmp
+        name: nginx-web-servers
         source: build
 
     - name: Container present
