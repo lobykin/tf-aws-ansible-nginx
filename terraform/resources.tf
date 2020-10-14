@@ -84,7 +84,7 @@ resource "aws_instance" "nginx-instance" {
   }
 
   provisioner "remote-exec" {
-    inline = ["sudo apt-get -qq install python -y"]
+    inline = ["sudo apt-get -qq install python3 -y; sudo ln --symbolic /usr/bin/python3 /usr/bin/python"]
   }
 
   provisioner "local-exec" {
