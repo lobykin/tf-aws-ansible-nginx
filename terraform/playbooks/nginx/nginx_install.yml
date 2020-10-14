@@ -1,0 +1,17 @@
+---
+# Nginx playbook
+- hosts: web-servers
+  user: ubuntu 
+  sudo: True
+
+  vars:
+     connections : "1024"
+
+     is_10_up: "'$ansible_distribution_version' >= '10.04'"
+     is_ubuntu: "'$ansible_distribution' == 'Ubuntu'"
+
+  tasks:
+     - include: nginx/tasks/setup.yml
+  handlers:
+     - name: restart nginx
+       action: service name=nginx state=restarted

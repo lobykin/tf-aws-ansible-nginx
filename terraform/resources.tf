@@ -99,7 +99,7 @@ resource "aws_instance" "nginx-instance" {
   }
 
   tags = {
-    Name     = "nginx-instance-${count.index +1 }"
+    Name     = "nginx-instance-${count.index}"
     Location = "N.Virginia"
   }
 
