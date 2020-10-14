@@ -25,6 +25,7 @@
     - name: install docker-py
       pip: 
        name: docker-py
+       executable: pip
       
     - name: Build Docker image from Dockerfile
       docker_image:
