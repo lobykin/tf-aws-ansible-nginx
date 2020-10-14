@@ -34,14 +34,14 @@
        executable: pip3
       
     - name: Build Docker image from Dockerfile
-      docker_image:
+      community.general.docker_image:
         build: 
           path: /tmp/Dockerfile
         name: nginx-web-server
         source: build
 
     - name: Container present
-      docker_container:
+      community.general.docker_container:
         name: nginx-web-server
         state: present
         image: nginx-web-server:latest
@@ -49,7 +49,7 @@
         
 
     - name: Running the container
-      docker_container:
+      community.general.docker_container:
         image: nginx-web-server:latest
         state: started
         healthcheck: 
