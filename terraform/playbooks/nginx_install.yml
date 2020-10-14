@@ -16,12 +16,26 @@
       
     - name: Build Docker image from Dockerfile
       docker_image:
-        name: web
-        path: docker
-        state: build
+        build: 
+          path: ./
+        name: nginx-web-server
+        source: build
+
+    - name: Container present
+      docker_container:
+        name: nginx-web-server
+        state: present
+        image: nginx-web-server:latest
+        command: sleep infinity
         
+
     - name: Running the container
       docker_container:
-        image: web:latest
-        path: docker
-        state: running
+        image: nginx-web-server:latest
+        state: started
+        healthcheck: 
+#          test: ["CMD", "curl", "--fail", "http://nginx.host.com"]
+#          interval: 1m30s
+#          timeout: 10s
+#          retries: 3
+#          start_period: 30s        
