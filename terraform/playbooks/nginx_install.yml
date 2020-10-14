@@ -39,22 +39,14 @@
       copy:
         src: ./Dockerfile
         dest: /tmp/Dockerfile      
-        
+
     - name: Build Docker image from Dockerfile
       docker_image:
         build: 
           path: /tmp
         name: nginx-web-servers
         source: build
-
-    - name: Container present
-      docker_container:
-        name: nginx-web-server
-        state: present
-        image: nginx-web-server:latest
-        command: sleep infinity
         
-
     - name: Running the container
       docker_container:
         image: nginx-web-server:latest
