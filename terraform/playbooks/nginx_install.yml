@@ -5,14 +5,27 @@
   become_method: sudo
 
   tasks:
+    - name: Upgrade all packages on servers
+      apt: upgrade=dist force_apt_get=yes
+    - name: symlink /usr/bin/python -> /usr/bin/python3
+      raw: |
+        if [ -f /usr/bin/python3 ] && [ ! -f /usr/bin/python ]; then
+          ln --symbolic /usr/bin/python3 /usr/bin/python; 
+        fi
+
+    - name: Run the equivalent of "apt-get update"
+      apt:
+        update_cache: yes
+
     - name: Install pip
       apt: 
-       name: python-pip 
+       name: python-pip3 
        state: present
       
     - name: install docker-py
       pip: 
        name: docker-py
+       executable: pip3
       
     - name: Build Docker image from Dockerfile
       docker_image:
