@@ -8,7 +8,7 @@
 
     - name: Copy Dockerfile
       copy:
-        src: ./terraform/playbooks/Dockerfile
+        src: ./Dockerfile
         dest: /tmp/Dockerfile
   
     - name: Upgrade all packages on servers
