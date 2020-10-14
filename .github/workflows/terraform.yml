@@ -21,12 +21,15 @@ jobs:
         chmod 400 ~/.ssh/ec2_key_pair.pem
         echo $EC2_KEY_PUB_64 | openssl base64 -A -d > ~/.ssh/ec2_key_pair.pub
         chmod 644 ~/.ssh/ec2_key_pair.pub
+    - name: Terraform Plan
+      run: terraform plan
+    
     - name: Terraform init
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       run: terraform init -input=false
-
+ 
     - name: Terraform validation
       run: terraform validate
 
