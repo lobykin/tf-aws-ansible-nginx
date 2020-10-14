@@ -46,10 +46,11 @@
           path: /tmp
         name: nginx-web-servers
         source: build
-
+        
     - name: Running the container
       docker_container:
-        name: nginx-web-server
+        name: nginx-docker
+        image: nginx-web-server:latest
         state: started
         healthcheck: 
 #          test: ["CMD", "curl", "--fail", "http://nginx.host.com"]
