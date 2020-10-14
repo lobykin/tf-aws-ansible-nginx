@@ -63,7 +63,7 @@
         
 
     - name: Running the container
-      community.general.docker_container:
+      docker_container:
         image: nginx-web-server:latest
         state: started
         healthcheck: 
