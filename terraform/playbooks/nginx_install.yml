@@ -5,23 +5,37 @@
   become_method: sudo
 
   tasks:
-
-    - name: Copy Dockerfile
-      copy:
-        src: ./Dockerfile
-        dest: /tmp/Dockerfile
-  
-    - name: Upgrade all packages on servers
-      apt: upgrade=dist force_apt_get=yes
-    - name: symlink /usr/bin/python -> /usr/bin/python3
-      raw: |
-        if [ -f /usr/bin/python3 ] && [ ! -f /usr/bin/python ]; then
-          ln --symbolic /usr/bin/python3 /usr/bin/python; 
-        fi
-
     - name: Run the equivalent of "apt-get update"
       apt:
         update_cache: yes
+    - name: Configuring Docker Repository
+      yum_repository:
+        name: Docker
+        description: "Docker Repo"
+        baseurl: "https://download.docker.com/linux/centos/docker-ce.repo" 
+        gpgcheck: no
+      register: x
+ 
+    - name: Checking Configuration Status
+      debug:
+        var: x.failed
+ 
+    - name: Installing Docker
+      package:
+        name: "docker-ce-18.06.3.ce-3.el7.x86_64"
+        state: present
+      register: y
+ 
+    - name: Checking Install Status
+      debug:
+        var: y.failed
+ 
+    - name: Starting Docker Daemon
+      service:
+        name: docker
+        state: started
+        enabled: yes
+      when: y.failed == false
 
     - name: Install pip
       apt: 
@@ -49,7 +63,7 @@
         
 
     - name: Running the container
-      docker_container:
+      community.general.docker_container:
         image: nginx-web-server:latest
         state: started
         healthcheck: 
