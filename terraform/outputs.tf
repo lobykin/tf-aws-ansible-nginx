@@ -3,5 +3,5 @@ output "url-nginx" {
 }
 
 output "ip" {
- value = "${aws_instance.nginx-instance.public_ip}"
+ value = aws_instance.nginx-instance.0.public_ip
 }
