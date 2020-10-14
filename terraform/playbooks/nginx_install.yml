@@ -34,7 +34,12 @@
       pip: 
        name: docker
        executable: pip3
-      
+
+    - name: Copy Dockerfile
+      copy:
+        src: ./Dockerfile
+        dest: /tmp/Dockerfile      
+        
     - name: Build Docker image from Dockerfile
       docker_image:
         build: 
