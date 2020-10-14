@@ -1,16 +1,18 @@
 ---
 - name: Install Nginx
-  hosts: nginx
-  remote_user: ubuntu
+  hosts: nginx-instance
   become: yes
   become_method: sudo
 
   tasks:
     - name: Install pip
-      apt: name=python-pip state=present
+      apt: 
+       name: python-pip 
+       state: present
       
     - name: install docker-py
-      pip: name=docker-py
+      pip: 
+       name: docker-py
       
     - name: Build Docker image from Dockerfile
       docker_image:
