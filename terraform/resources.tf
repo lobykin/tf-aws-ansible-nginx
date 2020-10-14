@@ -70,8 +70,6 @@ resource "aws_instance" "nginx-instance" {
   ebs_block_device {
     device_name           = "/dev/sdg"
     volume_size           = 60
-    volume_type           = "io1"
-    iops                  = 2000
     encrypted             = true
     delete_on_termination = true
   }
@@ -94,8 +92,7 @@ resource "aws_instance" "nginx-instance" {
 	    echo "[nginx-instance]" | tee -a nginx-instance.ini;
 	    echo "${aws_instance.nginx-instance[count.index].public_ip} ansible_user=${var.ansible_user} ansible_ssh_private_key_file=${var.private_key}" | tee -a nginx-instance.ini;
       export ANSIBLE_HOST_KEY_CHECKING=False;
-      ansible-galaxy collection install community.general
-	    ansible-playbook -u ${var.ansible_user} --private-key ${var.private_key} -i nginx-instance.ini ./terraform/playbooks/nginx_install.yml -vvvv
+	    ansible-playbook -u ${var.ansible_user}  -vvvv --private-key ${var.private_key} -i nginx-instance.ini ./terraform/playbooks/nginx_install.yml
     EOT
   }
 
