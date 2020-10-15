@@ -45,7 +45,7 @@
         name: nginx-web-server:v1.0
         build:
           path: /tmp
-          source: build
+        source: build
         state: present        
 
     - name: archive container image as a tarball
