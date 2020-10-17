@@ -50,7 +50,7 @@
       shell: docker pull nginx
 
     - name: Build custom container
-      shell: sudo docker build -t nginx_stats /tmp
+      shell: docker build -t nginx_stats /tmp
 
     - name: Run Docker Nginx  
       shell: docker run --name nginx -d -p 8080:80 nginx_stats
