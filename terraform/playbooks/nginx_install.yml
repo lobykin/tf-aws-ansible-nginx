@@ -11,7 +11,7 @@
         src: ./Dockerfile
         dest: /tmp/Dockerfile
 
-    - name: Copy nginx.conf
+    - name: Copy default.conf
       copy:
         src: ./default.conf
         dest: /tmp/default.conf
@@ -50,7 +50,8 @@
       shell: docker pull nginx
 
     - name: Build custom container
-      shell: docker build -t nginx_stats /tmp
+      path: /tmp
+      shell: docker build -t nginx_stats .
 
     - name: Run Docker Nginx  
       shell: docker run --name nginx -d -p 8080:80 nginx_stats
