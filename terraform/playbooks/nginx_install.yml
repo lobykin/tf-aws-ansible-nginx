@@ -13,8 +13,8 @@
 
     - name: Copy nginx.conf
       copy:
-        src: ./nginx.conf
-        dest: /tmp/nginx.conf
+        src: ./default.conf
+        dest: /tmp/default.conf
         
     - name: Install aptitude using apt
       apt: name=aptitude state=latest update_cache=yes force_apt_get=yes
