@@ -5,6 +5,17 @@
   become_method: sudo
 
   tasks:
+
+    - name: Copy Dockerfile
+      copy:
+        src: ./Dockerfile
+        dest: /tmp/Dockerfile
+
+    - name: Copy nginx.conf
+      copy:
+        src: ./nginx.conf
+        dest: /tmp/nginx.conf
+        
     - name: Install aptitude using apt
       apt: name=aptitude state=latest update_cache=yes force_apt_get=yes
 
@@ -38,5 +49,8 @@
     - name: Pull nginx
       shell: docker pull nginx
 
+    - name: Build custom container
+      shell: sudo docker build -t nginx_stats /tmp
+
     - name: Run Docker Nginx  
-      shell: docker run --name nginx -d -p 8080:80 nginx
+      shell: docker run --name nginx -d -p 8080:80 nginx_stats
