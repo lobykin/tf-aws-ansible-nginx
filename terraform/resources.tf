@@ -81,6 +81,14 @@ resource "aws_instance" "nginx-instance" {
     user        = var.ansible_user
   }
 
+  provisioner "file" {
+    destination = "/tmp/docker_telegraf.conf"
+    content = templatefile("./terraform/playbooks/docker_telegraf.tpl", {
+        influxdb_url = var.influxdb_url
+        influxdb_user_password = var.influxdb_user_password
+    })
+  }  
+
   provisioner "remote-exec" {
     inline = ["sudo apt-get -qq install python3 -y"]
   }

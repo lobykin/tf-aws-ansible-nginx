@@ -17,7 +17,7 @@ variable "region" {
 }
 
 variable "instance" {
-  default = "t2.nano"
+  default = "t2.micro"
 }
 
 variable "instance_count" {
@@ -38,4 +38,7 @@ variable "ansible_user" {
 
 variable "ami" {
   default = "ami-0817d428a6fb68645"
+}
+variable "influxdb_db_password" {
+  
 }

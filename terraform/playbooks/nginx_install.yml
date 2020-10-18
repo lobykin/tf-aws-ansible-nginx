@@ -57,3 +57,8 @@
 
     - name: Run Docker Nginx  
       shell: docker run --name nginx -d -p 8080:80 nginx_stats
+    
+    - name: Pull Telegraf
+      shell: docker pull telegraf
+    - name: Config and run telegraf
+      shell: docker run -v /tmp/telegraf.conf:/etc/telegraf/telegraf.conf:ro telegraf
