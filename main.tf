@@ -12,5 +12,4 @@ terraform {
 # Call the seed_module to build Nginx App
 module "terraform" {
   source             = "./terraform"
-  
 }

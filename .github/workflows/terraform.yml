@@ -11,12 +11,14 @@ jobs:
     - name: Verify Terraform version
       run: terraform --version
 
-    - name: Getting Influx IP
+    - name: Assigning Influx IP adress to Environment Variable
       run: |
-        export TF_VAR_influxdb_url=http://$(~/.local/bin/aws ec2 describe-instances \
+        echo "TF_VAR_influxdb_url=http://$(~/.local/bin/aws ec2 describe-instances \
         --filters "Name=tag:Name,Values=grafana-instance" \
         --query 'Reservations[*].Instances[*].[PublicIpAddress]' \
-        --output text):8086
+        --output text):8086" >> $GITHUB_ENV
+    - name: Check if environment Applied successfully
+      run: echo $TF_VAR_influxdb_url
 
     - name: Generate Key Pair
       env:
@@ -39,6 +41,7 @@ jobs:
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        TF_VAR_influxdb_user_password: ${{ secrets.INFLUXDB_USER_PASSWORD }}
       run: terraform plan
       
     - name: Terraform validation
@@ -48,4 +51,5 @@ jobs:
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        TF_VAR_influxdb_user_password: ${{ secrets.INFLUXDB_USER_PASSWORD }}
       run: terraform apply -auto-approve -input=false
