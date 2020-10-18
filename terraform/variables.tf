@@ -39,7 +39,6 @@ variable "ansible_user" {
 variable "ami" {
   default = "ami-0817d428a6fb68645"
 }
-variable "influxdb_db_password" {
-}
-variable "influxdb_url" {
-}
+
+variable "influxdb_user_password" {}
+variable "influxdb_url" {}
