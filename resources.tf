@@ -83,7 +83,7 @@ resource "aws_instance" "nginx-instance" {
 
   provisioner "file" {
     destination = "/tmp/docker_telegraf.conf"
-    content = templatefile("./terraform/playbooks/docker_telegraf.tpl", {
+    content = templatefile("./playbooks/docker_telegraf.tpl", {
         influxdb_url = var.influxdb_url
         influxdb_user_password = var.influxdb_user_password
     })
@@ -100,7 +100,7 @@ resource "aws_instance" "nginx-instance" {
 	    echo "[nginx-instance]" | tee -a nginx-instance.ini;
 	    echo "${aws_instance.nginx-instance[count.index].public_ip} ansible_user=${var.ansible_user} ansible_ssh_private_key_file=${var.private_key}" | tee -a nginx-instance.ini;
       export ANSIBLE_HOST_KEY_CHECKING=False;
-	    ansible-playbook -u ${var.ansible_user}  -vvv --private-key ${var.private_key} -i nginx-instance.ini ./terraform/playbooks/nginx_install.yml
+	    ansible-playbook -u ${var.ansible_user}  -vvv --private-key ${var.private_key} -i nginx-instance.ini ./playbooks/nginx_install.yml
     EOT
   }
 
