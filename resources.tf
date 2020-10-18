@@ -83,8 +83,8 @@ resource "aws_instance" "nginx-instance" {
 
   provisioner "file" {
     content = templatefile("${path.module}/playbooks/docker_telegraf.tpl", {
-        influxdb_url = "${var.influxdb_url}"
-        influxdb_user_password = "${var.influxdb_user_password}"
+        influxdb_url = var.influxdb_url,
+        influxdb_user_password = var.influxdb_user_password
     })
     destination = "/tmp/docker_telegraf.conf"
   }  
