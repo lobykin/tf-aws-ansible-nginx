@@ -8,11 +8,6 @@
 #
 # Use 'telegraf -config telegraf.conf -test' to see what metrics a config
 # file would generate.
-#
-# Environment variables can be used anywhere in this config file, simply surround
-# them with ${}. For strings the variable must be within quotes (ie, "${STR_VAR}"),
-# for numbers and booleans they should be plain (ie, ${INT_VAR}, ${BOOL_VAR})
-
 
 # Global tags can be specified here in key="value" format.
 [global_tags]
