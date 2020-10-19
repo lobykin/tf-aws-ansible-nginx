@@ -90,7 +90,7 @@ resource "aws_iam_policy" "ec2_log_policy" {
 
 resource "aws_iam_policy_attachment" "ec2_log_policy_attachment" {
   name       = "ec2-log-policy-attachment"
-  roles      = aws_iam_role.ec2_log_role.name
+  role      = aws_iam_role.ec2_log_role.name
   policy_arn = aws_iam_policy.ec2_log_policy.arn
 }
 
