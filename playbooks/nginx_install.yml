@@ -61,4 +61,6 @@
     - name: Pull Telegraf
       shell: docker pull telegraf
     - name: Config and run telegraf
-      shell: docker run -v /tmp/telegraf.conf:/etc/telegraf/telegraf.conf:ro telegraf
+      shell: docker run -v telegraf.conf:/etc/telegraf/telegraf.conf:ro telegraf
+      args:
+        chdir: /tmp/
