@@ -86,7 +86,7 @@ resource "aws_instance" "nginx-instance" {
         influxdb_url = var.influxdb_url
         influxdb_user_password = var.influxdb_user_password
     })
-    destination = "/tmp/docker_telegraf.conf"
+    destination = "/tmp/telegraf.conf"
   }  
 
   provisioner "remote-exec" {
