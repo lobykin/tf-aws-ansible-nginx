@@ -61,7 +61,6 @@
     - name: Pull nginx
       shell: docker pull nginx
 
-
     - name: Build custom container
       shell: docker build -t nginx_stats .
       args:

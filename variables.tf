@@ -45,6 +45,9 @@ variable "ami" {
 }
 
 variable "influxdb_user_password" {}
+
 variable "aws_access_key_id" {}
+
 variable "aws_secret_access_key" {}
+
 variable "influxdb_url" {}

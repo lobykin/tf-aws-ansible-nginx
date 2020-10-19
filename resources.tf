@@ -134,7 +134,7 @@ resource "aws_instance" "nginx-instance" {
     private_key = file(var.private_key)
     user        = var.ansible_user
   }
-
+//Adding credentials from Docker Daemon
   provisioner "file" {
     content = templatefile("${path.module}/playbooks/credentials.tpl", {
         aws_access_key_id = var.aws_access_key_id
@@ -142,7 +142,7 @@ resource "aws_instance" "nginx-instance" {
     })
     destination = "/tmp/credentials.conf"
   } 
-
+// Adding Configuration for Telegraf
   provisioner "file" {
     content = templatefile("${path.module}/playbooks/docker_telegraf.tpl", {
         influxdb_url = var.influxdb_url
@@ -150,7 +150,7 @@ resource "aws_instance" "nginx-instance" {
     })
     destination = "/tmp/telegraf.conf"
   }  
-
+// In case of python not yet installed for Ansible
   provisioner "remote-exec" {
     inline = ["sudo apt-get -qq install python3 -y"]
   }
