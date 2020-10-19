@@ -47,6 +47,58 @@ resource "aws_dynamodb_table" "tf_lock_state" {
     BuiltBy = "Terraform"
   }
 }
+// Building role for CloudWatch pair for AWS Instance
+resource "aws_iam_role" "ec2_log_role" {
+  name               = "ec2-role"
+  assume_role_policy = <<EOF
+{
+ "Version": "2020-10-19",
+ "Statement": [
+   {
+     "Action": "sts:AssumeRole",
+     "Principal": {
+       "Service": "ec2.amazonaws.com"
+     },
+     "Effect": "Allow",
+     "Sid": ""
+   }
+ ]
+}
+EOF
+}
+
+resource "aws_iam_policy" "ec2_log_policy" {
+  name        = "ec2-log-policy"
+  description = "Allowing write logs"
+  policy      = <<EOF
+  {
+  "Version": "2020-10-19",
+  "Statement": [
+    {
+      "Action": [
+        "logs:CreateLogStream",
+        "logs:PutLogEvents"
+      ],
+      "Effect": "Allow",
+      "Resource": "*"
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_policy_attachment" "test-attach" {
+  name       = "test-attachment"
+  roles      = ["${aws_iam_role.ec2_log_role.name}"]
+  policy_arn = "${ec2_log_policy.policy.arn}"
+}
+
+// Building profile
+resource "aws_iam_instance_profile" "ec2_log_profile" {
+  name  = "ec2_log_profile"                         
+  roles = ["${aws_iam_role.ec2_log_role.name}"]
+}
+
 
 // Building key pair for AWS Instance
 resource "aws_key_pair" "key_pair_pem" {
@@ -59,7 +111,7 @@ resource "aws_instance" "nginx-instance" {
   ami           = var.ami
   instance_type = var.instance
   key_name      = aws_key_pair.key_pair_pem.key_name
-//iam_instance_profile  = var.log_role
+  iam_instance_profile = "${aws_iam_instance_profile.ec2_log_profile.name}"
   vpc_security_group_ids = [
     aws_security_group.nginx-web.id,
     aws_security_group.nginx-ssh.id,
