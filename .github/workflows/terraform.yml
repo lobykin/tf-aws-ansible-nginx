@@ -13,7 +13,7 @@ jobs:
 
     - name: Assigning Influx IP adress to Environment Variable
       run: |
-        echo "TF_VAR_influxdb_url=http://$(~/.local/bin/aws ec2 describe-instances \
+        echo "TF_VAR_influxdb_url=http://$(aws ec2 describe-instances \
         --filters "Name=tag:Name,Values=grafana-instance" \
         --query 'Reservations[*].Instances[*].[PublicIpAddress]' \
         --output text):8086" >> $GITHUB_ENV
@@ -35,6 +35,8 @@ jobs:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         TF_VAR_influxdb_user_password: ${{ secrets.INFLUXDB_USER_PASSWORD }}
+        TF_VAR_aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        TF_VAR_aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       run: terraform init -input=false
 
     - name: Terraform Plan
@@ -42,6 +44,8 @@ jobs:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         TF_VAR_influxdb_user_password: ${{ secrets.INFLUXDB_USER_PASSWORD }}
+        TF_VAR_aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        TF_VAR_aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       run: |
       
         terraform plan
@@ -54,4 +58,6 @@ jobs:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         TF_VAR_influxdb_user_password: ${{ secrets.INFLUXDB_USER_PASSWORD }}
+        TF_VAR_aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        TF_VAR_aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       run: terraform apply -auto-approve -input=false
