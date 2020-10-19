@@ -70,11 +70,9 @@ EOF
 resource "aws_iam_policy" "ec2_log_policy" {
   name        = "ec2-log-policy"
   description = "Allowing write logs"
-  policy      = <<EOF
-  {
+  policy      = jsonencode({
     "Version": "2012-10-17",
-    "Statement": [
-        {
+    "Statement": [{
             "Action": [
                 "autoscaling:Describe*",
                 "cloudwatch:*",
@@ -86,10 +84,8 @@ resource "aws_iam_policy" "ec2_log_policy" {
             ],
             "Effect": "Allow",
             "Resource": "*"
-        }
-    ]
-  }
-  EOF
+        }],
+  })
 }
 
 resource "aws_iam_policy_attachment" "ec2_log_policy_attachment" {
