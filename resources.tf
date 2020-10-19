@@ -59,7 +59,7 @@ resource "aws_instance" "nginx-instance" {
   ami           = var.ami
   instance_type = var.instance
   key_name      = aws_key_pair.key_pair_pem.key_name
-  iam_instance_profile  = var.log_role
+//iam_instance_profile  = var.log_role
   vpc_security_group_ids = [
     aws_security_group.nginx-web.id,
     aws_security_group.nginx-ssh.id,
