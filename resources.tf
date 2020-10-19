@@ -102,7 +102,7 @@ resource "aws_instance" "nginx-instance" {
     inline = [
       "echo '${var.aws_access_key_id}' >> /tmp/test.file",
       "sudo apt-get -qq install python3 -y",
-      "sudo ./my_script.sh"
+      "sudo ./tmp/export.sh"
       ]
   }
 
