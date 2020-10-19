@@ -56,11 +56,11 @@
         chdir: /tmp/
 
     - name: Run Docker Nginx  
-      shell: docker run --name nginx -d -p 8080:80 nginx_stats
+      shell: docker run --name nginx -d -p 8080:80 --log-driver=awslogs --log-opt awslogs-group=docker-nginx-logs  nginx_stats
     
     - name: Pull Telegraf
       shell: docker pull telegraf
     - name: Config and run telegraf
-      shell: docker run -v $PWD/telegraf.conf:/etc/telegraf/telegraf.conf:ro telegraf
+      shell: docker run -v $PWD/telegraf.conf:/etc/telegraf/telegraf.conf:ro --log-driver=awslogs --log-opt awslogs-group=docker-nginx-logs telegraf
       args:
         chdir: /tmp/
