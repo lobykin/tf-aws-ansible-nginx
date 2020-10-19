@@ -51,14 +51,19 @@ resource "aws_dynamodb_table" "tf_lock_state" {
 resource "aws_iam_role" "ec2_log_role" {
   name               = "ec2-log-role"
   assume_role_policy = jsonencode({
-    "Version": "2012-10-17",
-    "Statement": [
-      {
-         "Sid": "",
-         "Effect": "Allow",
-         "Action": "sts:AssumeRole",
-         "Resource": "*"
-      }]
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "",
+      "Effect": "Allow",
+      "Principal": {
+        "Service": [
+          "ec2.amazonaws.com"
+        ]
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
 })
 }
 
