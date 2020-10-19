@@ -136,14 +136,6 @@ resource "aws_instance" "nginx-instance" {
   }
 
   provisioner "file" {
-    content = templatefile("${path.module}/playbooks/export.tpl", {
-        aws_access_key_id = var.aws_access_key_id
-        aws_secret_access_key = var.aws_secret_access_key
-    })
-    destination = "/tmp/export.sh"
-  } 
-
-  provisioner "file" {
     content = templatefile("${path.module}/playbooks/docker_telegraf.tpl", {
         influxdb_url = var.influxdb_url
         influxdb_user_password = var.influxdb_user_password
@@ -153,11 +145,20 @@ resource "aws_instance" "nginx-instance" {
 
   provisioner "remote-exec" {
     inline = [
+      "sudo mkdir -p /etc/systemd/system/docker.service.d/",
       "echo '${var.aws_access_key_id}' >> /tmp/test.file",
       "sudo apt-get -qq install python3 -y",
       "sudo /bin/bash /tmp/export.sh"
       ]
   }
+
+  provisioner "file" {
+    content = templatefile("${path.module}/playbooks/export.tpl", {
+        aws_access_key_id = var.aws_access_key_id
+        aws_secret_access_key = var.aws_secret_access_key
+    })
+    destination = "/etc/systemd/system/docker.service.d/credentials.conf"
+  } 
 
   provisioner "local-exec" {
     command = <<EOT
