@@ -152,12 +152,7 @@ resource "aws_instance" "nginx-instance" {
   }  
 
   provisioner "remote-exec" {
-    inline = [
-      "mkdir -p /etc/systemd/system/docker.service.d",
-      "sudo cp /tmp/credentials.conf /etc/systemd/system/docker.service.d/",
-      "echo '${var.aws_access_key_id}' >> /tmp/test.file",
-      "sudo apt-get -qq install python3 -y",
-      ]
+    inline = ["sudo apt-get -qq install python3 -y"]
   }
 
   provisioner "local-exec" {
