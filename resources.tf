@@ -86,32 +86,22 @@ resource "aws_iam_policy" "ec2_log_policy" {
             ],
             "Effect": "Allow",
             "Resource": "*"
-        },
-        {
-            "Effect": "Allow",
-            "Action": "iam:CreateServiceLinkedRole",
-            "Resource": "arn:aws:iam::*:role/aws-service-role/events.amazonaws.com/AWSServiceRoleForCloudWatchEvents*",
-            "Condition": {
-                "StringLike": {
-                    "iam:AWSServiceName": "events.amazonaws.com"
-                }
-            }
         }
-    ] 
+    ]
   }
   EOF
 }
 
 resource "aws_iam_policy_attachment" "ec2_log_policy_attachment" {
   name       = "ec2-log-policy-attachment"
-  roles      = aws_iam_role.ec2_log_role.name
-  policy_arn = ec2_log_policy.policy.arn
+  role      = aws_iam_role.ec2_log_role.name
+  policy_arn = aws_iam_policy.ec2_log_policy.arn
 }
 
 // Building profile
 resource "aws_iam_instance_profile" "ec2_log_profile" {
   name  = "ec2-log-profile"                         
-  roles = aws_iam_role.ec2_log_role.name
+  role = aws_iam_role.ec2_log_role.name
 }
 
 
