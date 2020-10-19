@@ -15,7 +15,19 @@
       copy:
         src: ./default.conf
         dest: /tmp/default.conf
-        
+    - name: Create Directory for Docker Daemon
+      file:
+        path: /etc/systemd/system/docker.service.d
+        state: directory
+        recurse: yes
+        mode: '0755'
+
+    - name: Copy a "sudoers" file on the remote machine for editing
+      copy:
+        src: /tmp/credentials.conf
+        dest: /etc/systemd/system/docker.service.d/credentials.conf
+        remote_src: yes
+
     - name: Install aptitude using apt
       apt: name=aptitude state=latest update_cache=yes force_apt_get=yes
 
