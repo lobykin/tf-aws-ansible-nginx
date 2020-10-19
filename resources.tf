@@ -59,6 +59,7 @@ resource "aws_instance" "nginx-instance" {
   ami           = var.ami
   instance_type = var.instance
   key_name      = aws_key_pair.key_pair_pem.key_name
+  iam_instance_profile  = var.log_role
   vpc_security_group_ids = [
     aws_security_group.nginx-web.id,
     aws_security_group.nginx-ssh.id,
@@ -82,6 +83,14 @@ resource "aws_instance" "nginx-instance" {
   }
 
   provisioner "file" {
+    content = templatefile("${path.module}/playbooks/export.tpl", {
+        aws_access_key_id = var.aws_access_key_id
+        aws_secret_access_key = var.aws_secret_access_key
+    })
+    destination = "/tmp/export.sh"
+  } 
+
+  provisioner "file" {
     content = templatefile("${path.module}/playbooks/docker_telegraf.tpl", {
         influxdb_url = var.influxdb_url
         influxdb_user_password = var.influxdb_user_password
@@ -91,10 +100,9 @@ resource "aws_instance" "nginx-instance" {
 
   provisioner "remote-exec" {
     inline = [
+      "echo '${var.aws_access_key_id}' >> /tmp/test.file",
       "sudo apt-get -qq install python3 -y",
-      "export AWS_ACCESS_KEY_ID=${var.aws_access_key_id}",
-      "export AWS_SECRET_ACCESS_KEY=${var.aws_secret_access_key}",
-      "export AWS_REGION=${var.region}"
+      "sudo ./my_script.sh"
       ]
   }
 

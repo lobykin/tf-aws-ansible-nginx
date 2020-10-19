@@ -12,6 +12,10 @@ variable "profile" {
   default = "nginx-user"
 }
 
+variable "log_role" {
+  default = "docker-nginx-logs"
+}
+
 variable "region" {
   default = "us-east-1"
 }
