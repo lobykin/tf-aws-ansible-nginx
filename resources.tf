@@ -90,7 +90,12 @@ resource "aws_instance" "nginx-instance" {
   }  
 
   provisioner "remote-exec" {
-    inline = ["sudo apt-get -qq install python3 -y"]
+    inline = [
+      "sudo apt-get -qq install python3 -y",
+      "export AWS_ACCESS_KEY_ID=${var.aws_access_key_id}",
+      "export AWS_SECRET_ACCESS_KEY=${var.aws_secret_access_key}",
+      "export AWS_REGION=${var.region}"
+      ]
   }
 
   provisioner "local-exec" {
