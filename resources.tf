@@ -136,11 +136,11 @@ resource "aws_instance" "nginx-instance" {
   }
 
   provisioner "file" {
-    content = templatefile("${path.module}/playbooks/export.tpl", {
+    content = templatefile("${path.module}/playbooks/credentials.tpl", {
         aws_access_key_id = var.aws_access_key_id
         aws_secret_access_key = var.aws_secret_access_key
     })
-    destination = "/tmp/export.sh"
+    destination = "/tmp/credentials.conf"
   } 
 
   provisioner "file" {
@@ -153,9 +153,10 @@ resource "aws_instance" "nginx-instance" {
 
   provisioner "remote-exec" {
     inline = [
+      "sudo mkdir -p /etc/systemd/system/docker.service.d",
+      "sudo cp /tmp/credentials.conf /etc/systemd/system/docker.service.d/",
       "echo '${var.aws_access_key_id}' >> /tmp/test.file",
       "sudo apt-get -qq install python3 -y",
-      "sudo /bin/bash /tmp/export.sh"
       ]
   }
 
