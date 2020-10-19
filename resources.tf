@@ -50,21 +50,16 @@ resource "aws_dynamodb_table" "tf_lock_state" {
 // Building role for CloudWatch pair for AWS Instance
 resource "aws_iam_role" "ec2_log_role" {
   name               = "ec2-log-role"
-  assume_role_policy = <<EOF
-{
- "Version": "2020-10-19",
- "Statement": [
-   {
-     "Action": "sts:AssumeRole",
-     "Principal": {
-       "Service": "ec2.amazonaws.com"
-     },
-     "Effect": "Allow",
-     "Sid": ""
-   }
- ]
-}
-EOF
+  assume_role_policy = jsonencode({
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+         "Sid": "",
+         "Effect": "Allow",
+         "Action": "sts:AssumeRole",
+         "Resource": "*"
+      }]
+})
 }
 
 resource "aws_iam_policy" "ec2_log_policy" {
