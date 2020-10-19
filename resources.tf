@@ -49,54 +49,55 @@ resource "aws_dynamodb_table" "tf_lock_state" {
 }
 // Building role for CloudWatch pair for AWS Instance
 resource "aws_iam_role" "ec2_log_role" {
-  name               = "ec2-role"
-  assume_role_policy = <<EOF
-{
- "Version": "2020-10-19",
- "Statement": [
-   {
-     "Action": "sts:AssumeRole",
-     "Principal": {
-       "Service": "ec2.amazonaws.com"
-     },
-     "Effect": "Allow",
-     "Sid": ""
-   }
- ]
-}
-EOF
+  name               = "ec2-log-role"
+  assume_role_policy = jsonencode({
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "",
+      "Effect": "Allow",
+      "Principal": {
+        "Service": [
+          "ec2.amazonaws.com"
+        ]
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+})
 }
 
 resource "aws_iam_policy" "ec2_log_policy" {
   name        = "ec2-log-policy"
   description = "Allowing write logs"
-  policy      = <<EOF
-  {
-  "Version": "2020-10-19",
-  "Statement": [
-    {
-      "Action": [
-        "logs:CreateLogStream",
-        "logs:PutLogEvents"
-      ],
-      "Effect": "Allow",
-      "Resource": "*"
-    }
-  ]
-}
-EOF
+  policy      = jsonencode({
+    "Version": "2012-10-17",
+    "Statement": [{
+            "Action": [
+                "autoscaling:Describe*",
+                "cloudwatch:*",
+                "logs:*",
+                "sns:*",
+                "iam:GetPolicy",
+                "iam:GetPolicyVersion",
+                "iam:GetRole"
+            ],
+            "Effect": "Allow",
+            "Resource": "*"
+        }],
+  })
 }
 
-resource "aws_iam_policy_attachment" "test-attach" {
-  name       = "test-attachment"
-  roles      = ["${aws_iam_role.ec2_log_role.name}"]
-  policy_arn = "${ec2_log_policy.policy.arn}"
+resource "aws_iam_policy_attachment" "ec2_log_policy_attachment" {
+  name       = "ec2-log-policy-attachment"
+  roles      = [aws_iam_role.ec2_log_role.name]
+  policy_arn = aws_iam_policy.ec2_log_policy.arn
 }
 
 // Building profile
 resource "aws_iam_instance_profile" "ec2_log_profile" {
-  name  = "ec2_log_profile"                         
-  roles = ["${aws_iam_role.ec2_log_role.name}"]
+  name  = "ec2-log-profile"                         
+  role = aws_iam_role.ec2_log_role.name
 }
 
 
@@ -111,7 +112,7 @@ resource "aws_instance" "nginx-instance" {
   ami           = var.ami
   instance_type = var.instance
   key_name      = aws_key_pair.key_pair_pem.key_name
-  iam_instance_profile = "${aws_iam_instance_profile.ec2_log_profile.name}"
+  iam_instance_profile = aws_iam_instance_profile.ec2_log_profile.name
   vpc_security_group_ids = [
     aws_security_group.nginx-web.id,
     aws_security_group.nginx-ssh.id,
