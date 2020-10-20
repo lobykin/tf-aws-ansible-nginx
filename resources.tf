@@ -47,7 +47,6 @@ resource "aws_dynamodb_table" "tf_lock_state" {
     BuiltBy = "Terraform"
   }
 }
-
 // Building role for CloudWatch pair for AWS Instance
 resource "aws_iam_role" "ec2_log_role" {
   name               = "ec2-log-role"
@@ -152,7 +151,6 @@ resource "aws_instance" "nginx-instance" {
     })
     destination = "/tmp/telegraf.conf"
   }  
-
 // In case of python not yet installed for Ansible
   provisioner "remote-exec" {
     inline = ["sudo apt-get -qq install python3 -y"]

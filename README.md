@@ -2,7 +2,7 @@
 
 Repository to create AWS EC2 Instanse with Nginx and Telegraf installed and dockerized
 
-Tools: Telegraf Nginx Terraform Ansible Docker
+Tools: **Telegraf** **Nginx** **Terraform** **Ansible** **Docker**
 
 ## Required
 
@@ -24,6 +24,7 @@ Tools: Telegraf Nginx Terraform Ansible Docker
 3. Configuration management done using Ansible and
 4. Services delivered by Docker containers
 5. All sensitive data locked in Github Actions  Secret Menegenment service
+6. Logs from Nginx assigned to CloudWatch and also availbae in Grafana
 
 Github Secrets Required:
 
