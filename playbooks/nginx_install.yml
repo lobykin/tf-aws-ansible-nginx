@@ -6,32 +6,33 @@
 
   tasks:
 
-    - name: Copy Dockerfile
+    - name: Copy Dockerfile With Nginx configuration
       copy:
         src: ./Dockerfile
         dest: /tmp/Dockerfile
 
-    - name: Copy default.conf
+    - name: Copy default.conf Nginx server configuration
       copy:
         src: ./default.conf
         dest: /tmp/default.conf
-    - name: Create Directory for Docker Daemon
+
+    - name: Create Directory for Docker Daemon to apply AWS credentials
       file:
         path: /etc/systemd/system/docker.service.d
         state: directory
         recurse: yes
         mode: '0755'
 
-    - name: Copy a "sudoers" file on the remote machine for editing
+    - name: Copy credentials file to remote machine for bypassing log creating auth
       copy:
         src: /tmp/credentials.conf
         dest: /etc/systemd/system/docker.service.d/credentials.conf
         remote_src: yes
 
-    - name: Install aptitude using apt
+    - name: Install aptitude using apt for docker
       apt: name=aptitude state=latest update_cache=yes force_apt_get=yes
 
-    - name: Install required system packages
+    - name: Install required system packages for docker
       apt: name={{ item }} state=latest update_cache=yes
       loop: [ 'apt-transport-https', 'ca-certificates', 'curl', 'software-properties-common', 'python3-pip', 'virtualenv', 'python3-setuptools']
 
@@ -53,28 +54,29 @@
        name: python3-pip 
        state: present
       
-    - name: install docker
+    - name: Install docker
       pip: 
        name: docker
        executable: pip3
 
-    - name: Pull nginx
+    - name: Pull nginx images from repo 
       shell: docker pull nginx
 
-    - name: Create Network
+    - name: Create CrossContainer Network to monitor nginx contain
       shell: docker network create nginx_net
 
-    - name: Build custom container from dockerfile
+    - name: Build custom container from dockerfile 
       shell: docker build -t nginx_stats .
       args:
         chdir: /tmp/
 
-    - name: Run Docker Nginx  
+    - name: Run Docker Nginx Conttainer  
       shell: docker run --net=nginx_net --name nginx -d -p 8080:8080 --log-driver=awslogs --log-opt awslogs-group=nginx-log --log-opt awslogs-create-group=true  nginx_stats
     
-    - name: Pull Telegraf
+    - name: Pulling Telegraf Images from repo
       shell: docker pull telegraf
-    - name: Config and run telegraf
+
+    - name: Config and run telegraf from temp directory
       shell: docker run -d --net=nginx_net -v $PWD/telegraf.conf:/etc/telegraf/telegraf.conf:ro --log-driver=awslogs --log-opt awslogs-group=telegraf-log --log-opt awslogs-create-group=true -v /var/run/docker.sock:/var/run/docker.sock -v /var/run/docker.sock:/var/run/docker.sock -v /:/hostfs:ro -e HOST_ETC=/hostfs/etc -e HOST_PROC=/hostfs/proc -e HOST_SYS=/hostfs/sys -e HOST_VAR=/hostfs/var -e HOST_RUN=/hostfs/run -e HOST_MOUNT_PREFIX=/hostfs telegraf
       args:
         chdir: /tmp/

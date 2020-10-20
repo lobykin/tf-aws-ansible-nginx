@@ -1,3 +1,5 @@
+// Referring Terraform Version and State Object and DB Table
+// Bucket created using workflow run
 terraform {
   required_version = ">=0.13.4"
   backend "s3" {

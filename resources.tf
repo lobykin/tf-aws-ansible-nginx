@@ -2,7 +2,7 @@
 resource "aws_s3_bucket" "state_bucket" {
   bucket = var.s3_bucket_name
 
-// Best practice to add encryption the S3 bucket at rest by default
+// As recommended adding encryption to the S3 bucket
   server_side_encryption_configuration {
     rule {
       apply_server_side_encryption_by_default {
@@ -33,10 +33,10 @@ resource "aws_dynamodb_table" "tf_lock_state" {
 // Pay per request is cheaper for low-i/o applications, like our TF lock state
   billing_mode = "PAY_PER_REQUEST"
 
-// Hash key is required, and must be an attribute
+// Declaring Hash key for state table
   hash_key = "LockID"
 
-// Attribute LockID is required for TF to use this table for lock state
+// Attribute LockID is required for Terrafrom to use this table for lock state
   attribute {
     name = "LockID"
     type = "S"
@@ -47,6 +47,7 @@ resource "aws_dynamodb_table" "tf_lock_state" {
     BuiltBy = "Terraform"
   }
 }
+
 // Building role for CloudWatch pair for AWS Instance
 resource "aws_iam_role" "ec2_log_role" {
   name               = "ec2-log-role"
@@ -66,7 +67,7 @@ resource "aws_iam_role" "ec2_log_role" {
   ]
 })
 }
-
+// Creating policy with cloudwatch permissions
 resource "aws_iam_policy" "ec2_log_policy" {
   name        = "ec2-log-policy"
   description = "Allowing write logs"
@@ -100,13 +101,12 @@ resource "aws_iam_instance_profile" "ec2_log_profile" {
   role = aws_iam_role.ec2_log_role.name
 }
 
-
 // Building key pair for AWS Instance
 resource "aws_key_pair" "key_pair_pem" {
   key_name   = "ec2_key_pair"
   public_key = file(var.public_key)
 }
-// Building  Instance
+// Building  EC2 AWS Instance
 resource "aws_instance" "nginx-instance" {
   count = var.instance_count
   ami           = var.ami
@@ -134,7 +134,8 @@ resource "aws_instance" "nginx-instance" {
     private_key = file(var.private_key)
     user        = var.ansible_user
   }
-//Adding credentials from Docker Daemon
+
+//Declaring environment variables with AWS credentials for  Docker Daemon to bypass Cloudwatch Auth
   provisioner "file" {
     content = templatefile("${path.module}/playbooks/credentials.tpl", {
         aws_access_key_id = var.aws_access_key_id
@@ -142,7 +143,8 @@ resource "aws_instance" "nginx-instance" {
     })
     destination = "/tmp/credentials.conf"
   } 
-// Adding Configuration for Telegraf
+
+// Adding Configuration for Telegraf agent
   provisioner "file" {
     content = templatefile("${path.module}/playbooks/docker_telegraf.tpl", {
         influxdb_ip = var.influxdb_ip
@@ -150,11 +152,12 @@ resource "aws_instance" "nginx-instance" {
     })
     destination = "/tmp/telegraf.conf"
   }  
+
 // In case of python not yet installed for Ansible
   provisioner "remote-exec" {
     inline = ["sudo apt-get -qq install python3 -y"]
   }
-
+// Installing Python on remote host to fullfill Ansible depends
   provisioner "local-exec" {
     command = <<EOT
       sleep 600;
@@ -172,10 +175,10 @@ resource "aws_instance" "nginx-instance" {
   }
 
 }
-
+// Security groups creation
 resource "aws_security_group" "nginx-ssh" {
   name        = "nginx-ssh-group"
-  description = "Security group for nat instances that allows SSH and VPN traffic from internet"
+  description = "Security group for SSH access to the host"
   ingress {
     from_port   = 22
     to_port     = 22
@@ -189,7 +192,7 @@ resource "aws_security_group" "nginx-ssh" {
 
 resource "aws_security_group" "nginx-web" {
   name        = "nginx-web-group"
-  description = "Security group for WAN traffic"
+  description = "Security group for HTTP/HTTPS"
   ingress {
     from_port   = 80
     to_port     = 80
@@ -209,7 +212,7 @@ resource "aws_security_group" "nginx-web" {
 
 resource "aws_security_group" "nginx-egress-tls" {
   name        = "nginx-egress-tls"
-  description = "Security group that allows inbound and outbound traffic from all instances in the VPC"
+  description = "Security group for intranet VPC"
   egress {
     from_port   = 0
     to_port     = 0
@@ -239,7 +242,7 @@ resource "aws_security_group" "nginx-icmp" {
 
 resource "aws_security_group" "nginx-web-server" {
   name        = "nginx-web-server"
-  description = "Security group open port 8080"
+  description = "Security group open port 8080, 8092, 8094 for Nginx and Telegraf"
   ingress {
     from_port   = 8080
     to_port     = 8080

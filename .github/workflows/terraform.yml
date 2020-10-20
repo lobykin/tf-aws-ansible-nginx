@@ -1,6 +1,9 @@
 name: Deploying workflow
 
-on: [push]
+on:
+  push:
+   tags:        
+     - v1.*
 
 jobs:
   terraform_apply:
