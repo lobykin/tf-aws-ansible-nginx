@@ -12,13 +12,16 @@ jobs:
       run: terraform --version
 
     - name: Assigning Influx IP adress to Environment Variable
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       run: |
-        echo "TF_VAR_influxdb_url=http://$(aws ec2 describe-instances \
+        echo "TF_VAR_influxdb_ip=$(aws ec2 describe-instances \
         --filters "Name=tag:Name,Values=grafana-instance" \
-        --query 'Reservations[*].Instances[*].[PublicIpAddress]' \
-        --output text):8086" >> $GITHUB_ENV
+        --query 'Reservations[*].Instances[*].[PrivateIPAddress]' \
+        --output text)" >> $GITHUB_ENV
     - name: Check if environment Applied successfully
-      run: echo $TF_VAR_influxdb_url
+      run: echo $TF_VAR_influxdb_ip
 
     - name: Generate Key Pair
       env:

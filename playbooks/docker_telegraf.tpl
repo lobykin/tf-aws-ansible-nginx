@@ -104,11 +104,11 @@
   ## urls will be written to each interval.
   # urls = ["unix:///var/run/influxdb.sock"]
   # urls = ["udp://127.0.0.1:8089"]
-  urls = ["${influxdb_url}"]
+  urls = ["http://${influxdb_ip}:8086"]
 
   ## The target database for metrics; will be created as needed.
   ## For UDP url endpoint database needs to be configured on server side.
-  database = "telegraf"
+  database = "terraform"
 
   ## The value of this tag will be used to determine the database.  If this
   ## tag is not set the 'database' option is used as the default.
@@ -767,30 +767,64 @@
 #                            INPUT PLUGINS                                    #
 ###############################################################################
 
+[[inputs.cpu]]
+  percpu = true
+  totalcpu = true
+  fielddrop = ["time_*"]
+[[inputs.disk]]
+  ignore_fs = ["tmpfs", "devtmpfs"]
+
+[[inputs.diskio]]
+
+[[inputs.kernel]]
+
+[[inputs.mem]]
+
+[[inputs.processes]]
+
+[[inputs.swap]]
+
+[[inputs.system]]
+
+[[inputs.net]]
+
+[[inputs.netstat]]
+
 [[inputs.nginx]]
-  urls = ["http://localhost:8080/nginx_status"]
+  urls = ["http://nginx:8080/nginx_status"]
   response_timeout = "5s"
 
 # Read metrics about docker containers
 [[inputs.docker]]
+  endpoint = "unix:///var/run/docker.sock"
+  container_names = []
+  timeout = "5s"
+  perdevice = true
+  ## Whether to report for each container total blkio and network stats or not
+  total = false
+  ## docker labels to include and exclude as tags.  Globs accepted.
+  ## Note that an empty array for both will include all labels as tags
+  docker_label_include = []
+  docker_label_exclude = []
+
   ## Docker Endpoint
   ##   To use TCP, set endpoint = "tcp://[ip]:[port]"
   ##   To use environment variables (ie, docker-machine), set endpoint = "ENV"
-  endpoint = "unix:///var/run/docker.sock"
+#  endpoint = "unix:///var/run/docker.sock"
 
   ## Set to true to collect Swarm metrics(desired_replicas, running_replicas)
-  gather_services = false
+  # gather_services = false
 
   ## Only collect metrics for these containers, collect all if empty
-  container_names = []
+  # container_names = []
 
   ## Set the source tag for the metrics to the container ID hostname, eg first 12 chars
-  source_tag = false
+  # source_tag = false
 
   ## Containers to include and exclude. Globs accepted.
   ## Note that an empty array for both will include all containers
-  container_name_include = []
-  container_name_exclude = []
+  # container_name_include = []
+  # container_name_exclude = []
 
   ## Container states to include and exclude. Globs accepted.
   ## When empty only containers in the "running" state will be captured.
@@ -800,22 +834,22 @@
   # container_state_exclude = []
 
   ## Timeout for docker list, info, and stats commands
-  timeout = "5s"
+  # timeout = "5s"
 
   ## Whether to report for each container per-device blkio (8:0, 8:1...) and
   ## network (eth0, eth1, ...) stats or not
-  perdevice = true
+  # perdevice = true
 
   ## Whether to report for each container total blkio and network stats or not
-  total = false
+  # total = false
 
   ## Which environment variables should we use as a tag
   ##tag_env = ["JAVA_HOME", "HEAP_SIZE"]
 
   ## docker labels to include and exclude as tags.  Globs accepted.
   ## Note that an empty array for both will include all labels as tags
-  docker_label_include = []
-  docker_label_exclude = []
+  # docker_label_include = []
+  # docker_label_exclude = []
 
   ## Optional TLS Config
   # tls_ca = "/etc/telegraf/ca.pem"

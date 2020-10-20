@@ -61,17 +61,20 @@
     - name: Pull nginx
       shell: docker pull nginx
 
-    - name: Build custom container
+    - name: Create Network
+      shell: docker network create nginx_net
+
+    - name: Build custom container from dockerfile
       shell: docker build -t nginx_stats .
       args:
         chdir: /tmp/
 
     - name: Run Docker Nginx  
-      shell: docker run --name nginx -d -p 8080:8080 --log-driver=awslogs --log-opt awslogs-group=nginx-log --log-opt awslogs-create-group=true  nginx_stats
+      shell: docker run --net=nginx_net --name nginx -d -p 8080:8080 --log-driver=awslogs --log-opt awslogs-group=nginx-log --log-opt awslogs-create-group=true  nginx_stats
     
     - name: Pull Telegraf
       shell: docker pull telegraf
     - name: Config and run telegraf
-      shell: docker run -d -p 8092:8092/udp -p 8094:8094/tcp -v $PWD/telegraf.conf:/etc/telegraf/telegraf.conf:ro --log-driver=awslogs --log-opt awslogs-group=telegraf-log --log-opt awslogs-create-group=true telegraf
+      shell: docker run -d --net=nginx_net -v $PWD/telegraf.conf:/etc/telegraf/telegraf.conf:ro --log-driver=awslogs --log-opt awslogs-group=telegraf-log --log-opt awslogs-create-group=true -v /var/run/docker.sock:/var/run/docker.sock -v /var/run/docker.sock:/var/run/docker.sock -v /:/hostfs:ro -e HOST_ETC=/hostfs/etc -e HOST_PROC=/hostfs/proc -e HOST_SYS=/hostfs/sys -e HOST_VAR=/hostfs/var -e HOST_RUN=/hostfs/run -e HOST_MOUNT_PREFIX=/hostfs telegraf
       args:
         chdir: /tmp/

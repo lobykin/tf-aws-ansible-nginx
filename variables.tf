@@ -50,4 +50,4 @@ variable "aws_access_key_id" {}
 
 variable "aws_secret_access_key" {}
 
-variable "influxdb_url" {}
+variable "influxdb_ip" {}
